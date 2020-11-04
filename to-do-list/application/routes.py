@@ -2,19 +2,22 @@ from flask import render_template, redirect, url_for
 
 from application import db, app
 from application.models import Todos
-
+from application.forms import ToDoForm
 
 @app.route('/')
 def index():
     all_todos = Todos.query.all()
     return render_template('index.html', all_todos=all_todos)
 
-@app.route('/add')
+@app.route('/add', methods=['GET','POST'])
 def add():
-    new_todo = Todos(task='New Todo')
-    db.session.add(new_todo)
-    db.session.commit()
-    return redirect(url_for('index'))
+    form = ToDoForm()
+    if form.validate_on_submit():
+        new_todo = Todos(task=form.task.data)
+        db.session.add(new_todo)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('add.html', form=form)
 
 @app.route('/complete/<int:todo_id>')
 def complete(todo_id):
