@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SOME_KEY'
 
 class UserCheck:
-    def __init__(self, banned, message=None): # Here we set up the class to have the banned and message attributes. banned must be passed through at declaration.
+    def __init__(self, banned, message=None): # Here we set up the class to have the banned and message attributes. banned must be passed through at declaration.    
         self.banned = banned
         if not message:
             message = 'Please choose another user name' # If no message chosen, then this default message is returned.
@@ -18,13 +18,22 @@ class UserCheck:
         if field.data.lower() in (word.lower() for word in self.banned):
             raise ValidationError(self.message)
 
+class SpecialCharCheck:
+    def __init__(self, banned, message=None):
+        self.banned = banned
+        self.message = 'Please do not include special characters'
+
+    def __call__(self, form, field):
+        for specialChar in self.banned:
+            if specialChar in field.data:
+                raise ValidationError(self.message)
+
 class myForm(FlaskForm):
-    username = StringField('Username', validators=[
-        DataRequired(),
+    username = StringField('Username', validators=[DataRequired(),
          # We call our custom validator here, and pass through a message to override the default one. We pass through the list of banned usernames as a list.
         UserCheck(message="custom rejection message",banned = ['root','admin','sys']),
-        Length(min=2,max=15)
-        ])
+        SpecialCharCheck(message="customer rejection message",banned = ['%','^','&','*','(',')']),
+        Length(min=2,max=15)])
     submit = SubmitField('Sign up')
 
 @app.route('/', methods=['GET','POST'])
