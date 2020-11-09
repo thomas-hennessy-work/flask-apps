@@ -1,9 +1,24 @@
 {% extends 'layout.html' %}
 {% block body_content %}
 
-{% for todo in all_todos %}
+<form method='POST' action='{{ url_for('index') }}'>
+	{{ form.order.label }} {{ form.order }}
+	<br>
+	{{ form.submit }}
+</form>
 
-{{ todo.task }} 
+{% if totals['total'] == 0 %}
+<h3>Add some todo's</h3>
+{% elif totals['number_completed'] == totals['total'] %}
+<h3>Good Job!</h3>
+{% elif totals['number_completed'] < totals['total'] - 3 %}
+<h3>You're falling behind</h3>
+{% endif %}
+
+{% for todo in all_todos %}
+{{ todo.task }}
+<br>
+To be completed by: {{todo.dateAdded}}
 {% if todo.complete %}
 &#9989
 {% endif %}
@@ -13,8 +28,8 @@
 </form>
 {% if todo.complete %}
 	<form action='{{ url_for('incomplete', todo_id=todo.id) }}'>
-                <button>Incomplete</button>
-        </form>
+               	<button>Incomplete</button>
+       	</form>
 {% else %}
 	<form action='{{ url_for('complete', todo_id=todo.id) }}'>
 		<button>Complete</button>
@@ -23,7 +38,7 @@
 <form action='{{ url_for('delete', todo_id=todo.id) }}'>
 	<button>Delete</button>
 </form>
-<br><br> 
+<br><br>
 {% endfor %}
 
 {% endblock body_content %}

@@ -13,6 +13,16 @@
 			{{ error }}
 		{% endfor %}
 	{% endif %}
+
+	<br>
+
+	{{ form.dateAdded.label }} {{ form.dateAdded }}
+	{% if form.dateAdded.errors %}
+                {% for error in form.dateAdded.errors %}
+                        <br>
+                        {{ error }}
+                {% endfor %}
+        {% endif %}
 	<br>
 	{{ form.submit }}
 </form>
